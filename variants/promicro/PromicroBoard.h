@@ -61,5 +61,32 @@ public:
     NVIC_SystemReset();
   }
 
+  void powerOff() override {
+    #ifdef HAS_GPS
+        digitalWrite(GPS_VRTC_EN, LOW);
+        digitalWrite(GPS_RESET, LOW);
+        digitalWrite(GPS_SLEEP_INT, LOW);
+        digitalWrite(GPS_RTC_INT, LOW);
+        pinMode(GPS_RESETB, OUTPUT);
+        digitalWrite(GPS_RESETB, LOW);
+    #endif
+    
+    #ifdef BUZZER_EN
+        digitalWrite(BUZZER_EN, LOW);
+    #endif
+    
+    #ifdef PIN_3V3_EN
+        digitalWrite(PIN_3V3_EN, LOW);
+    #endif
+
+    #ifdef LED_PIN
+    digitalWrite(LED_PIN, LOW);
+    #endif
+    #ifdef BUTTON_PIN
+    nrf_gpio_cfg_sense_input(digitalPinToInterrupt(BUTTON_PIN), NRF_GPIO_PIN_NOPULL, NRF_GPIO_PIN_SENSE_HIGH);
+    #endif
+    sd_power_system_off();
+  }
+
   bool startOTAUpdate(const char* id, char reply[]) override;
 };
